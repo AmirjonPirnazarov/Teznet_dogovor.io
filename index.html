@@ -1,60 +1,165 @@
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TezNet Contract Portal</title>
+  <title>TezNet - Создание онлайн договора</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/pdf-lib@1.17.1"></script>
 </head>
 <body>
-  <div id="login-container" class="container">
-    <h1>TezNet Contract Portal</h1>
-    <div class="login-form">
-      <input type="text" id="username" placeholder="Username">
-      <input type="password" id="password" placeholder="Password">
-      <button onclick="login()">Login</button>
-    </div>
-  </div>
+  <div class="container">
+    <header>
+      <h1>TezNet</h1>
+      <h2>Создание онлайн договора</h2>
+    </header>
 
-  <div id="contract-container" class="container hidden">
-    <h2>New Contract Registration</h2>
-    
-    <div class="photo-section">
-      <p class="photo-instructions" id="photoInstructions">Please take a photo of the front side of the passport</p>
-      
-      <div class="passport-photo hidden" id="frontVideo-container">
-        <h3>Passport Front</h3>
-        <video id="frontVideo" autoplay playsinline muted></video>
-        <canvas id="frontCanvas" class="hidden"></canvas>
-        <button onclick="takePhoto()">Take Front Photo</button>
+    <div class="stepper">
+      <div class="step active" data-step="1">
+        <div class="step-number">1</div>
+        <div class="step-title">Личные данные</div>
       </div>
-      
-      <div class="passport-photo hidden" id="backVideo-container">
-        <h3>Passport Back</h3>
-        <video id="backVideo" autoplay playsinline muted></video>
-        <canvas id="backCanvas" class="hidden"></canvas>
-        <button onclick="takePhoto()">Take Back Photo</button>
+      <div class="step" data-step="2">
+        <div class="step-number">2</div>
+        <div class="step-title">Тариф</div>
+      </div>
+      <div class="step" data-step="3">
+        <div class="step-number">3</div>
+        <div class="step-title">Адрес подключения</div>
+      </div>
+      <div class="step" data-step="4">
+        <div class="step-number">4</div>
+        <div class="step-title">Документы</div>
+      </div>
+      <div class="step" data-step="5">
+        <div class="step-number">5</div>
+        <div class="step-title">Проверка</div>
       </div>
     </div>
 
-    <div class="contract-form">
-      <input type="tel" id="phoneNumber" placeholder="Phone Number">
-      <input type="text" id="address" placeholder="Address">
-      <select id="tariff">
-        <option value="">Select Tariff</option>
-        <option value="basic">Basic Plan</option>
-        <option value="premium">Premium Plan</option>
-        <option value="unlimited">Unlimited Plan</option>
-      </select>
-      <select id="router">
-        <option value="">Select Router</option>
-        <option value="basic">Basic Router</option>
-        <option value="premium">Premium Router</option>
-      </select>
-      <input type="text" id="contractNumber" placeholder="Enter Contract Number">
-      <button onclick="processContract()" id="createContract" disabled>Create Contract</button>
-    </div>
-  </div>
+    <main id="formContainer">
+      <!-- Step 1: Personal Data -->
+      <form id="step1" class="form-step active">
+        <h3>Личные данные</h3>
+        <div class="form-group">
+          <label for="fullName">ФИО</label>
+          <input type="text" id="fullName" name="fullName" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Номер телефона</label>
+          <input type="tel" id="phone" name="phone" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <button type="button" class="btn-next">Далее</button>
+      </form>
 
-  <script src="app.js"></script>
+      <!-- Step 2: Tariff Selection -->
+      <form id="step2" class="form-step">
+        <h3>Выбор тарифа</h3>
+        <div class="tariff-cards">
+          <div class="tariff-card">
+            <h4>Эконом</h4>
+            <p>30 Мбит/с</p>
+            <p class="price">299 сом/мес</p>
+            <button type="button" class="btn-select-tariff" data-tariff="economy">Выбрать</button>
+          </div>
+          <div class="tariff-card">
+            <h4>Стандарт</h4>
+            <p>50 Мбит/с</p>
+            <p class="price">499 сом/мес</p>
+            <button type="button" class="btn-select-tariff" data-tariff="standard">Выбрать</button>
+          </div>
+          <div class="tariff-card">
+            <h4>Премиум</h4>
+            <p>100 Мбит/с</p>
+            <p class="price">799 сом/мес</p>
+            <button type="button" class="btn-select-tariff" data-tariff="premium">Выбрать</button>
+          </div>
+        </div>
+        <div class="navigation-buttons">
+          <button type="button" class="btn-prev">Назад</button>
+          <button type="button" class="btn-next" disabled>Далее</button>
+        </div>
+      </form>
+
+      <!-- Step 3: Connection Address -->
+      <form id="step3" class="form-step">
+        <h3>Адрес подключения</h3>
+        <div class="form-group">
+          <label for="city">Город</label>
+          <input type="text" id="city" name="city" required>
+        </div>
+        <div class="form-group">
+          <label for="street">Улица</label>
+          <input type="text" id="street" name="street" required>
+        </div>
+        <div class="form-group">
+          <label for="house">Дом</label>
+          <input type="text" id="house" name="house" required>
+        </div>
+        <div class="form-group">
+          <label for="apartment">Квартира</label>
+          <input type="text" id="apartment" name="apartment" required>
+        </div>
+        <div class="navigation-buttons">
+          <button type="button" class="btn-prev">Назад</button>
+          <button type="button" class="btn-next">Далее</button>
+        </div>
+      </form>
+
+      <!-- Step 4: Documents Upload -->
+      <form id="step4" class="form-step">
+        <h3>Загрузка документов</h3>
+        <div class="document-upload">
+          <div class="upload-section">
+            <h4>Паспорт (лицевая сторона)</h4>
+            <input type="file" id="passportFront" accept="image/*" required>
+            <div class="preview" id="previewFront"></div>
+          </div>
+          <div class="upload-section">
+            <h4>Паспорт (обратная сторона)</h4>
+            <input type="file" id="passportBack" accept="image/*" required>
+            <div class="preview" id="previewBack"></div>
+          </div>
+        </div>
+        <div class="navigation-buttons">
+          <button type="button" class="btn-prev">Назад</button>
+          <button type="button" class="btn-next">Далее</button>
+        </div>
+      </form>
+
+      <!-- Step 5: Review -->
+      <form id="step5" class="form-step">
+        <h3>Проверка данных</h3>
+        <div class="review-data">
+          <div class="review-section">
+            <h4>Личные данные</h4>
+            <p id="reviewName"></p>
+            <p id="reviewPhone"></p>
+            <p id="reviewEmail"></p>
+          </div>
+          <div class="review-section">
+            <h4>Выбранный тариф</h4>
+            <p id="reviewTariff"></p>
+          </div>
+          <div class="review-section">
+            <h4>Адрес подключения</h4>
+            <p id="reviewAddress"></p>
+          </div>
+        </div>
+        <div class="agreement">
+          <input type="checkbox" id="agreementCheckbox" required>
+          <label for="agreementCheckbox">Я согласен с условиями договора</label>
+        </div>
+        <div class="navigation-buttons">
+          <button type="button" class="btn-prev">Назад</button>
+          <button type="button" id="submitContract" class="btn-submit" disabled>Отправить договор</button>
+        </div>
+      </form>
+    </main>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
