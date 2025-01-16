@@ -1,4 +1,5 @@
 let stream;
+let currentPhotoSide = 'front'; // Track which photo we're taking
 
 // Login functionality
 function login() {
@@ -8,38 +9,70 @@ function login() {
   if (username && password) {
     document.getElementById('login-container').classList.add('hidden');
     document.getElementById('contract-container').classList.remove('hidden');
-    initializeCamera();
+    initializeCamera('front'); // Start with front photo
   }
 }
 
 // Camera initialization
-async function initializeCamera() {
+async function initializeCamera(side) {
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    document.getElementById('frontVideo').srcObject = stream;
-    document.getElementById('backVideo').srcObject = stream;
+    // Stop previous stream if exists
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+
+    // Request rear camera on mobile devices
+    stream = await navigator.mediaDevices.getUserMedia({ 
+      video: {
+        facingMode: { exact: "environment" }
+      }
+    });
+    
+    // Show only the current video element
+    document.getElementById('frontVideo').parentElement.classList.add('hidden');
+    document.getElementById('backVideo').parentElement.classList.add('hidden');
+    document.getElementById(`${side}Video`).parentElement.classList.remove('hidden');
+    
+    // Set the stream to the current video
+    document.getElementById(`${side}Video`).srcObject = stream;
+    currentPhotoSide = side;
   } catch (err) {
     console.error('Error accessing camera:', err);
-    alert('Unable to access camera. Please ensure camera permissions are granted.');
+    // Fallback to any available camera if environment camera fails
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      document.getElementById(`${side}Video`).srcObject = stream;
+    } catch (fallbackErr) {
+      alert('Unable to access camera. Please ensure camera permissions are granted.');
+    }
   }
 }
 
 // Photo capture
-function takePhoto(side) {
-  const video = document.getElementById(`${side}Video`);
-  const canvas = document.getElementById(`${side}Canvas`);
+function takePhoto() {
+  const video = document.getElementById(`${currentPhotoSide}Video`);
+  const canvas = document.getElementById(`${currentPhotoSide}Canvas`);
   const context = canvas.getContext('2d');
 
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
   
+  // Show canvas, hide video
   canvas.classList.remove('hidden');
   video.classList.add('hidden');
 
-  if (document.getElementById('frontCanvas').classList.contains('hidden') === false && 
-      document.getElementById('backCanvas').classList.contains('hidden') === false) {
+  // If front photo was taken, switch to back
+  if (currentPhotoSide === 'front') {
+    currentPhotoSide = 'back';
+    initializeCamera('back');
+  } else {
+    // Both photos taken, enable contract creation
     document.getElementById('createContract').disabled = false;
+    // Stop the camera stream
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
   }
 }
 
