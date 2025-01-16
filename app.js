@@ -21,29 +21,48 @@ async function initializeCamera(side) {
       stream.getTracks().forEach(track => track.stop());
     }
 
-    // Request rear camera on mobile devices
-    stream = await navigator.mediaDevices.getUserMedia({ 
+    const constraints = {
       video: {
-        facingMode: { exact: "environment" }
+        facingMode: 'environment', // This requests the rear camera
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
       }
-    });
+    };
+
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
     
     // Show only the current video element
     document.getElementById('frontVideo').parentElement.classList.add('hidden');
     document.getElementById('backVideo').parentElement.classList.add('hidden');
     document.getElementById(`${side}Video`).parentElement.classList.remove('hidden');
     
-    // Set the stream to the current video
-    document.getElementById(`${side}Video`).srcObject = stream;
+    const videoElement = document.getElementById(`${side}Video`);
+    videoElement.srcObject = stream;
+    videoElement.play();
+
+    // Update instructions based on current side
+    const instructions = document.getElementById('photoInstructions');
+    instructions.textContent = `Please take a photo of the ${side} side of the passport`;
+    
     currentPhotoSide = side;
   } catch (err) {
     console.error('Error accessing camera:', err);
-    // Fallback to any available camera if environment camera fails
+    alert('Unable to access camera. Please ensure camera permissions are granted and you are using a secure (HTTPS) connection.');
+    
+    // Try fallback to any available camera
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      document.getElementById(`${side}Video`).srcObject = stream;
+      stream = await navigator.mediaDevices.getUserMedia({ 
+        video: {
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        } 
+      });
+      const videoElement = document.getElementById(`${side}Video`);
+      videoElement.srcObject = stream;
+      videoElement.play();
     } catch (fallbackErr) {
-      alert('Unable to access camera. Please ensure camera permissions are granted.');
+      console.error('Fallback camera error:', fallbackErr);
+      alert('Could not access any camera. Please check your device settings.');
     }
   }
 }
