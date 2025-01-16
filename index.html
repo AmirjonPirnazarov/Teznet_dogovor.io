@@ -4,7 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TezNet - Создание онлайн договора</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="https://unpkg.com/pdf-lib@1.17.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -16,33 +16,55 @@
     <div class="stepper">
       <div class="step active" data-step="1">
         <div class="step-number">1</div>
-        <div class="step-title">Личные данные</div>
+        <div class="step-title">Документы</div>
       </div>
       <div class="step" data-step="2">
         <div class="step-number">2</div>
-        <div class="step-title">Тариф</div>
+        <div class="step-title">Личные данные</div>
       </div>
       <div class="step" data-step="3">
         <div class="step-number">3</div>
-        <div class="step-title">Адрес подключения</div>
+        <div class="step-title">Адрес</div>
       </div>
       <div class="step" data-step="4">
         <div class="step-number">4</div>
-        <div class="step-title">Документы</div>
-      </div>
-      <div class="step" data-step="5">
-        <div class="step-number">5</div>
         <div class="step-title">Проверка</div>
       </div>
     </div>
 
     <main id="formContainer">
-      <!-- Step 1: Personal Data -->
+      <!-- Step 1: Documents Upload -->
       <form id="step1" class="form-step active">
+        <h3>Загрузка документов</h3>
+        <div class="document-upload">
+          <div class="upload-section">
+            <h4>Паспорт (лицевая сторона)</h4>
+            <input type="file" id="passportFront" accept="image/*" required>
+            <div class="preview" id="previewFront"></div>
+          </div>
+          <div class="upload-section">
+            <h4>Паспорт (обратная сторона)</h4>
+            <input type="file" id="passportBack" accept="image/*" required>
+            <div class="preview" id="previewBack"></div>
+          </div>
+        </div>
+        <button type="button" class="btn-next">Далее</button>
+      </form>
+
+      <!-- Step 2: Personal Data -->
+      <form id="step2" class="form-step">
         <h3>Личные данные</h3>
+        <div class="form-group">
+          <label for="contractNumber">Номер договора</label>
+          <input type="text" id="contractNumber" name="contractNumber" required>
+        </div>
         <div class="form-group">
           <label for="fullName">ФИО</label>
           <input type="text" id="fullName" name="fullName" required>
+        </div>
+        <div class="form-group">
+          <label for="agentName">ФИО торгового агента</label>
+          <input type="text" id="agentName" name="agentName" required>
         </div>
         <div class="form-group">
           <label for="phone">Номер телефона</label>
@@ -52,39 +74,13 @@
           <label for="email">Email</label>
           <input type="email" id="email" name="email" required>
         </div>
-        <button type="button" class="btn-next">Далее</button>
-      </form>
-
-      <!-- Step 2: Tariff Selection -->
-      <form id="step2" class="form-step">
-        <h3>Выбор тарифа</h3>
-        <div class="tariff-cards">
-          <div class="tariff-card">
-            <h4>Эконом</h4>
-            <p>30 Мбит/с</p>
-            <p class="price">299 сом/мес</p>
-            <button type="button" class="btn-select-tariff" data-tariff="economy">Выбрать</button>
-          </div>
-          <div class="tariff-card">
-            <h4>Стандарт</h4>
-            <p>50 Мбит/с</p>
-            <p class="price">499 сом/мес</p>
-            <button type="button" class="btn-select-tariff" data-tariff="standard">Выбрать</button>
-          </div>
-          <div class="tariff-card">
-            <h4>Премиум</h4>
-            <p>100 Мбит/с</p>
-            <p class="price">799 сом/мес</p>
-            <button type="button" class="btn-select-tariff" data-tariff="premium">Выбрать</button>
-          </div>
-        </div>
         <div class="navigation-buttons">
           <button type="button" class="btn-prev">Назад</button>
-          <button type="button" class="btn-next" disabled>Далее</button>
+          <button type="button" class="btn-next">Далее</button>
         </div>
       </form>
 
-      <!-- Step 3: Connection Address -->
+      <!-- Step 3: Address -->
       <form id="step3" class="form-step">
         <h3>Адрес подключения</h3>
         <div class="form-group">
@@ -109,53 +105,44 @@
         </div>
       </form>
 
-      <!-- Step 4: Documents Upload -->
+      <!-- Step 4: Review and Signature -->
       <form id="step4" class="form-step">
-        <h3>Загрузка документов</h3>
-        <div class="document-upload">
-          <div class="upload-section">
-            <h4>Паспорт (лицевая сторона)</h4>
-            <input type="file" id="passportFront" accept="image/*" required>
-            <div class="preview" id="previewFront"></div>
-          </div>
-          <div class="upload-section">
-            <h4>Паспорт (обратная сторона)</h4>
-            <input type="file" id="passportBack" accept="image/*" required>
-            <div class="preview" id="previewBack"></div>
-          </div>
-        </div>
-        <div class="navigation-buttons">
-          <button type="button" class="btn-prev">Назад</button>
-          <button type="button" class="btn-next">Далее</button>
-        </div>
-      </form>
-
-      <!-- Step 5: Review -->
-      <form id="step5" class="form-step">
         <h3>Проверка данных</h3>
         <div class="review-data">
           <div class="review-section">
-            <h4>Личные данные</h4>
-            <p id="reviewName"></p>
-            <p id="reviewPhone"></p>
-            <p id="reviewEmail"></p>
+            <h4>Номер договора</h4>
+            <p id="reviewContractNumber"></p>
           </div>
           <div class="review-section">
-            <h4>Выбранный тариф</h4>
-            <p id="reviewTariff"></p>
+            <h4>Личные данные</h4>
+            <p id="reviewName"></p>
+            <p id="reviewAgentName"></p>
+            <p id="reviewPhone"></p>
+            <p id="reviewEmail"></p>
           </div>
           <div class="review-section">
             <h4>Адрес подключения</h4>
             <p id="reviewAddress"></p>
           </div>
         </div>
+        
+        <div class="signature-section">
+          <h4>Электронная подпись</h4>
+          <div class="signature-container">
+            <canvas id="signaturePad"></canvas>
+            <div class="signature-buttons">
+              <button type="button" id="clearSignature" class="btn-secondary">Очистить подпись</button>
+            </div>
+          </div>
+        </div>
+
         <div class="agreement">
           <input type="checkbox" id="agreementCheckbox" required>
-          <label for="agreementCheckbox">Я согласен с условиями договора</label>
+          <label for="agreementCheckbox">Я подтверждаю правильность введенных данных</label>
         </div>
         <div class="navigation-buttons">
           <button type="button" class="btn-prev">Назад</button>
-          <button type="button" id="submitContract" class="btn-submit" disabled>Отправить договор</button>
+          <button type="button" id="submitContract" class="btn-submit" disabled>Создать договор</button>
         </div>
       </form>
     </main>
