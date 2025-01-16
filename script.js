@@ -57,13 +57,24 @@ document.addEventListener('DOMContentLoaded', function() {
     input.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+          alert('Файл слишком большой. Максимальный размер 10MB');
+          return;
+        }
+        
         const reader = new FileReader();
         reader.onload = function(e) {
           preview.style.backgroundImage = `url(${e.target.result})`;
+          preview.innerHTML = ''; // Remove the upload label when image is shown
           formData.documents[inputId === 'passportFront' ? 'front' : 'back'] = file;
         };
         reader.readAsDataURL(file);
       }
+    });
+
+    // Add click handler to preview area to trigger file input
+    preview.addEventListener('click', function() {
+      input.click();
     });
   }
 

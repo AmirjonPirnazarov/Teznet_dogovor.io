@@ -39,13 +39,21 @@
         <div class="document-upload">
           <div class="upload-section">
             <h4>Паспорт (лицевая сторона)</h4>
+            <div class="preview" id="previewFront">
+              <label for="passportFront" class="upload-label">
+                Нажмите для загрузки фото
+              </label>
+            </div>
             <input type="file" id="passportFront" accept="image/*" required>
-            <div class="preview" id="previewFront"></div>
           </div>
           <div class="upload-section">
             <h4>Паспорт (обратная сторона)</h4>
+            <div class="preview" id="previewBack">
+              <label for="passportBack" class="upload-label">
+                Нажмите для загрузки фото
+              </label>
+            </div>
             <input type="file" id="passportBack" accept="image/*" required>
-            <div class="preview" id="previewBack"></div>
           </div>
         </div>
         <button type="button" class="btn-next">Далее</button>
